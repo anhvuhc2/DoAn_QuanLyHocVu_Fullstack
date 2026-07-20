@@ -1,0 +1,199 @@
+﻿# TÀI LIỆU KỊCH BẢN & ĐẶC TẢ MODULE HỆ THỐNG (TOÀN DIỆN & TỐI ƯU HÓA)
+-- ====================================================================
+-- SYSTEM: PRIMARY SCHOOL ACADEMIC MANAGEMENT SYSTEM (PROJECT_QUANLYHOCSINH26BT)
+-- AUTHOR: NGUYEN THI ANH VU
+-- TARGET SCHOOL: TRUONG TIEU HOC HAM CHINH 2
+-- FILE STRUCTURE: ALL-IN-ONE MODULE SPECIFICATION (BLUEPRINT.MD)
+-- ====================================================================
+
+## I. TỔNG QUAN HỆ THỐNG
+Đề tài cực kỳ phù hợp để tích hợp Trí tuệ nhân tạo (AI - Generative AI) vì trong môi trường học vụ tiểu học, phụ huynh thường xuyên đặt các câu hỏi lặp đi lặp lại về điểm số, kết quả học tập, tiêu chí đánh giá theo Thông tư 27 và các thông báo lịch trình của nhà trường. Những thông tin này đều có dữ liệu rõ ràng, quy định cụ thể và cách trả lời tương đối chuẩn hóa nên rất thích hợp để ứng dụng AI. Tuy nhiên, AI chỉ hoạt động hiệu quả khi dữ liệu được cập nhật đầy đủ, chính xác, bảo mật và nhất quán.
+
+Hệ thống được thiết kế theo cấu trúc phân lớp hiện đại, phân rã thành **4 module nghiệp vụ độc lập (4 Tác vụ cốt lõi)** nhưng kết nối dữ liệu chặt chẽ với nhau qua SQL Server, tích hợp cơ chế bảo mật phân quyền 2 tầng và sẵn sàng đồng bộ tự động với Front-end Next.js thông qua môi trường làm việc hợp nhất (Full-stack AI Workspace).
+
+---
+
+## II. KIẾN TRÚC HỆ THỐNG & CÔNG NGHỆ (N-Tier / API Architecture)
+
+### 1. Kiến Trúc Hệ Thống
+Hệ thống được thiết kế theo mô hình kiến trúc phân tầng (N-Tier), tách biệt rõ ràng giữa Cơ sở dữ liệu, Logic xử lý nghiệp vụ, Bảo mật và Giao diện tương tác. Cấu trúc này đảm bảo tính bảo trì cao, dễ mở rộng và tuyệt đối an toàn khi giao tiếp qua các RESTful Endpoints.
+┌────────────────────────────────────────────────────────────────────────┐
+│             CLIENT LAYER (Next.js / React / Ant Design UI)             │
+│    (Tự động liên kết API thông qua Workspace Indexing - Antigravity)   │
+└───────────────────────────────────┬────────────────────────────────────┘
+│ (RESTful API / JSON / JWT)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                  API CONTROLLERS LAYER (ASP.NET Core)                  │
+│       [Authorize(Roles = "...")]  ──  Endpoints Gateway                │
+└───────────────────────────────────┬────────────────────────────────────┘
+│
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                BUSINESS LOGIC / AI CORE & SECURITY LAYER               │
+│   • Phân quyền 2 tầng (RBAC + ABAC)        • Thông tư 27 Evaluation    │
+│   • Context-Aware AI Routing (Gemini)      • Virtual Assistant Engine  │
+└───────────────────────────────────┬────────────────────────────────────┘
+│ (Entity Framework Core ORM)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                 MODELS / ENTITY LAYER (DB Context)                     │
+│  HocSinh | LopHoc | TaiKhoan | BangDiem | KeHoachLop | TuongTac        │
+└───────────────────────────────────┬────────────────────────────────────┘
+│ (SQL / Transactions / Foreign Keys)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│               INFRASTRUCTURE LAYER (SQL Server & Storage)              │
+└────────────────────────────────────────────────────────────────────────┘
+
+
+---
+
+### 2. Công Nghệ Sử Dụng (Tech Stack Tối Ưu)
+
+#### 2.1. Tầng Backend (Máy chủ & Xử lý logic)
+* **Framework chính:** C# .NET Core / ASP.NET Web API. Nền tảng mạnh mẽ, bảo mật cao, hỗ trợ Dependency Injection và xây dựng RESTful API chuẩn mực cho môi trường giáo dục.
+* **Cơ sở dữ liệu:** Microsoft SQL Server 2014. Đảm bảo tính toàn vẹn dữ liệu tuyệt đối cho các hệ thống bảng liên kết phức tạp (Khóa ngoại, Transactions, Stored Procedures, Rollback logic).
+* **Giao tiếp Dữ liệu:** Entity Framework Core (ORM). Tối ưu hóa truy vấn LINQ, dễ dàng bảo trì và quản lý luồng dữ liệu theo mô hình Code-First / Database-First.
+* **Bảo mật & Phân quyền:** JWT (JSON Web Token) kết hợp Phân quyền 2 tầng (RBAC - Role-Based & ABAC - Attribute-Based Access Control).
+* **Lõi Trí Tuệ Nhân Tạo (AI Core):** Tích hợp Google Gemini API xử lý nhận diện ngôn ngữ tự nhiên, phân tích ngữ cảnh tin nhắn và phân luồng phản hồi tự động.
+
+#### 2.2. Tầng Frontend (Giao diện Web/App & Tương tác)
+* **Web Quản trị (Dành cho BGH & Giáo viên):** Xây dựng trên nền tảng **Next.js** (App Router) và **React**, sử dụng Server-Side Rendering (SSR) để tối ưu hóa tốc độ tải trang và hiệu năng xử lý dữ liệu lớn.
+* **Hệ thống Giao diện chuẩn mực:** Sử dụng bộ thư viện **Ant Design (Antd)**:
+  * **Antd Table:** Đồng bộ hiển thị các bảng biểu dữ liệu học sinh, điểm số với khả năng tự động phân trang (Pagination), sắp xếp (Sorting), tìm kiếm và chọn hàng loạt.
+  * **Antd Form:** Chuẩn hóa form nhập điểm và quản lý tài khoản với cơ chế kiểm tra ràng buộc thời gian thực (Real-time Validation), giúp giáo viên thao tác nhanh gọn giống Excel và giảm thiểu sai sót.
+* **Cổng Thông tin Phụ huynh:** Thiết kế tối ưu hiển thị trên các thiết bị di động (Responsive Web/App) bằng **Tailwind CSS**, giúp phụ huynh dễ dàng tra cứu điểm số và chat trực tiếp với Trợ lý ảo AI.
+* **Tự động hóa Đồng bộ API:** Áp dụng mô hình **Full-stack AI Workspace (Google Antigravity)**. Gom chung Back-end C#, Front-end Next.js và file `blueprint.md` vào cùng một Workspace. AI tự động đọc hiểu Controller C# để sinh ra các Interfaces TypeScript và Services gọi API bên Next.js khớp 100%, loại bỏ hoàn toàn việc copy-paste thủ công từ Swagger.
+
+---
+
+## III. CHI TIẾT 4 TÁC VỤ CỐT LÕI & CƠ CHẾ BẢO MẬT PHÂN QUYỀN
+
+Hệ thống được thiết kế bám sát quy trình tác nghiệp thực tế tại trường Tiểu học Hàm Chính 2, được chia thành **4 Tác vụ (Module) cốt lõi**, hoạt động dưới sự giám sát của cơ chế Bảo mật 2 Tầng nghiêm ngặt.
+
+### 🛡️ CƠ CHẾ BẢO MẬT 2 TẦNG (RBAC + ABAC) - ÁP DỤNG TOÀN HỆ THỐNG
+1. **Tầng 1 (RBAC - Role-Based):** Kiểm tra quyền hạn dựa trên vai trò đăng nhập JWT (`HieuTruong`, `GiaoVien`, `PhuHuynh`). Hiệu trưởng nắm quyền quản trị tối cao (Super Admin).
+2. **Tầng 2 (ABAC - Attribute-Based / Data Anchoring):** Phân quyền dựa trên mối quan hệ thực thể trong Database:
+   * **Giáo viên chủ nhiệm (GVCN):** Chỉ được phép thao tác (Thêm, Xóa, Sửa, Điểm danh) trên những **Học sinh (`HocSinh`)** và **Tài khoản Phụ huynh (`TaiKhoanPhuHuynh`)** thuộc đúng Lớp học (`LopHoc`) mà giáo viên đó được gán cột `GvchuNhiem`. Khi tạo/xóa tài khoản phụ huynh, hệ thống bắt buộc kiểm tra mỏ neo **Mã học sinh (`maHS`)**, ngăn chặn tuyệt đối việc lọt quyền sang lớp khác.
+   * **Giáo viên bộ môn (GVBM):** Chỉ được gán quyền nhập/sửa điểm trên các môn và lớp được phân công trong bảng `PhanCongGiangDay`.
+   * **Phụ huynh:** Hồ sơ bị khóa chặt với mã học sinh con em mình, không thể truy cập dữ liệu của học sinh khác.
+
+---
+
+### MODULE 1: QUẢN TRỊ HỒ SƠ, LỚP HỌC & PHÂN CÔNG GIẢNG DẠY (Class, Profile & Scheduling Management)
+Phân hệ nền tảng thiết lập cấu trúc dữ liệu ban đầu cho năm học, hỗ trợ quy trình quản lý và xếp thời khóa biểu linh hoạt:
+* **Quản lý Lớp học & Sĩ số:** Phân công Giáo viên chủ nhiệm (`GVChuNhiem`), quản lý niên khóa (`NienKhoa`), sĩ số và trạng thái lớp.
+* **Truy xuất Hồ sơ Học sinh Thông minh:** Phân tách giữa *"Danh sách sĩ số hiện tại"* (phục vụ điểm danh, nhập điểm hàng ngày) và *"Truy xuất hồ sơ toàn diện"* (phục vụ thống kê, báo cáo BGH). Tích hợp số điện thoại phụ huynh và kênh liên lạc ưu tiên (`UuTienZalo`).
+* **Quản lý Tài khoản & Phân quyền Linh hoạt:** Cho phép nhập hồ sơ học sinh trước để ổn định lớp. Tài khoản Phụ huynh có thể được tạo và liên kết vào cột `TaiKhoanPhuHuynh` sau chỉ với một thao tác dựa trên mã học sinh (`MaHS`).
+* **🛡️ Thuật Toán Phân Công Giảng Dạy & Chống Trùng Lịch (Anti-Collision Scheduling):**
+  * Hệ thống áp dụng kiểm soát ràng buộc kép (Double-Booking Prevention) trên bảng `PhanCongGiangDay` khi Ban Giám Hiệu xếp thời khóa biểu cho giáo viên bộ môn.
+  * **Quy tắc 1 (Độc quyền Không gian - Lớp học):** Tại cùng một thời điểm (Cùng `Thu`, cùng `Buổi`, cùng `Tiet`), một Lớp học (`MaLop`) **chỉ được phép tiếp nhận tối đa 01 Giáo viên** vào giảng dạy. Hệ thống chặn đứng mọi thao tác gán 2 giáo viên vào cùng một tiết của một lớp.
+  * **Quy tắc 2 (Độc quyền Thời gian - Giáo viên):** Tại cùng một thời điểm (Cùng `Thu`, cùng `Buổi`, cùng `Tiet`), một Giáo viên (`MaGiaoVien`) **chỉ được phép phân công dạy tại 01 Lớp học duy nhất**. Nếu giáo viên A đã có lịch dạy lớp 1A vào Tiết 1 sáng Thứ 2, hệ thống sẽ tự động khóa, không cho phép BGH phân công giáo viên A dạy tiết đó ở lớp 1B hay bất kỳ lớp nào khác.
+  * **Cơ chế xử lý:** Ràng buộc được thực thi đồng bộ từ tầng Cơ sở dữ liệu (**SQL Composite Unique Constraints**) đến tầng API Backend (**LINQ Collision Detection**), lập tức trả về lỗi cảnh báo chi tiết nếu phát hiện xung đột lịch trình.
+* **🛡️ Ràng Buộc Chuyên Cần & Chống Điểm Danh Trùng Lặp (Anti-Duplicate Attendance Tracking):**
+  * Do bảng `DiemDanh` sử dụng `ID` tự tăng làm Khóa chính (PK), hệ thống thiết lập bổ sung ràng buộc duy nhất tổ hợp (`Composite Unique Constraint`) trên cặp khóa `(MaHS, NgayVang)`.
+  * **Quy tắc Toàn vẹn:** Mỗi học sinh (`MaHS`) tại một ngày học cụ thể (`NgayVang`) **chỉ được phép tồn tại tối đa 01 bản ghi điểm danh duy nhất** trong hệ thống.
+  * **Cơ chế xử lý thông minh (Upsert Logic):** Khi Giáo viên Chủ nhiệm thao tác điểm danh hàng ngày trên giao diện Web (Ant Design Table/Form), Backend sẽ tự động kiểm tra lịch sử trong ngày: Nếu học sinh chưa được điểm danh ➔ Tạo bản ghi mới (`INSERT`); Nếu học sinh đã có tên trong danh sách điểm danh ngày hôm đó ➔ Hệ thống tự động chuyển sang chế độ cập nhật trạng thái (`UPDATE` - ví dụ đổi từ *Có mặt* sang *Vắng có phép*). Cơ chế này triệt tiêu hoàn toàn lỗi rác dữ liệu do bấm đúp hoặc gửi yêu cầu trùng lặp từ Front-end.
+### MODULE 2: QUẢN LÝ ĐÁNH GIÁ & BÁO ĐIỂM (Grading & Evaluation)
+Số hóa toàn diện quy trình đánh giá kết quả học tập theo chuẩn quy định hiện hành của Bộ Giáo dục:
+* **Quản lý Bảng điểm Chuyên nghiệp:** Lưu trữ điểm số chi tiết từng kỳ, từng môn học. Tích hợp trực tiếp giao diện **Antd Form / Grid Layout** giúp nhập liệu nhanh chóng.
+* **Tích hợp Quy chế Thông tư 27:** Chuẩn hóa hệ thống đánh giá bằng chữ đối với các môn nhận xét và tiêu chí năng lực (**H** - Hoàn thành, **T** - Hoàn thành Tốt, **C** - Chưa hoàn thành).
+* **🛡️ Ràng Buộc Toàn Vẹn Dữ Liệu Trước Khi Xuất (Strict Data Completeness):** 
+  * Hệ thống tích hợp chốt chặn tự động kiểm tra toàn bộ bảng điểm của lớp trước khi xuất hồ sơ hoặc gửi phụ huynh.
+  * **Đối với môn có điểm số (Toán, Tiếng Việt...):** Bắt buộc phải có điểm số cụ thể, và xếp loại phù hợp; tuyệt đối không được để trống (null/empty) bất kỳ ô nào của học sinh đang theo học.
+  * **Đối với môn đánh giá bằng nhận xét (Đạo đức, Thể dục, Âm nhạc...):** Bắt buộc phải được xếp loại hợp lệ theo chuẩn **T, H, C** (Hoàn thành Tốt, Hoàn thành, Chưa hoàn thành). Nếu phát hiện dù chỉ 1 ô trống hoặc xếp loại sai cú pháp, hệ thống sẽ **khóa nút xuất bảng điểm** và báo lỗi đỏ chỉ rõ tên học sinh/môn học bị thiếu để Giáo viên bổ sung.
+* **🛡️ Phân Quyền Xuất & Gửi Điểm Tuyệt Đối (Exclusive Ownership):** 
+  * Áp dụng nguyên tắc quyền lực đi đôi với trách nhiệm lớp học. **Chỉ duy nhất Giáo viên Chủ nhiệm (GVCN)** đang được gán mã chủ nhiệm của lớp đó mới có quyền truy cập nút "Xuất Bảng Điểm" và thực hiện lệnh "Gửi Thông Báo Điểm" đến tài khoản Phụ huynh lớp mình.
+  * Giáo viên Bộ môn (GVBM) chỉ có quyền nhập/sửa điểm môn mình dạy; GVCN lớp khác tuyệt đối không có quyền xem hay xuất bảng điểm trái phép.
+### MODULE 3: QUẢN LÝ KẾ HOẠCH, THÔNG BÁO & SỰ KIỆN LỚP (Class Planning & Dual-Channel Notifications)
+Phân hệ đóng vai trò là cầu nối truyền thông chính thức giữa Nhà trường, Giáo viên Chủ nhiệm (GVCN) và Phụ huynh học sinh. Hệ thống áp dụng mô hình **Phân kênh Thông báo Kép (Dual-Channel Notification)** thông qua thuộc tính `LoaiThongBao` trên cơ sở dữ liệu để tối ưu hóa quản lý và định hướng luồng xử lý cho Trợ lý ảo AI:
+#### 3.1. Phân loại & Khởi tạo Thông báo Kép (Dual-Channel Classification)
+* **Kênh 1: Thông báo Báo điểm & Học vụ (`LoaiThongBao = "BaoDiem"`):**
+* Chuyên biệt phục vụ các đợt tổng kết học kỳ (HK1, HK2, giữa kỳ), thông báo phiếu rèn luyện và kết quả xếp loại theo Thông tư 27.
+* **Tự động hóa liên kết:** Được tự động kích hoạt hoặc sinh ra từ **Module 2** ngay sau khi GVCN hoàn tất quy trình thẩm định và bấm xuất bảng điểm hợp lệ. Thông báo tự động đính kèm phiếu kết quả học tập cá nhân hóa của từng học sinh để phụ huynh tra cứu.
+* **Kênh 2: Thông báo Kế hoạch & Sự kiện Lớp (`LoaiThongBao = "KeHoach"`):**
+  * Phục vụ các thông tin không mang tính điểm số như: Kế hoạch dã ngoại, thông báo thu chi, lịch họp phụ huynh, hoạt động phong trào Đội, hoặc nhắc nhở mang đồ dùng học tập thực hành.
+  * GVCN có quyền chủ động soạn thảo tiêu đề, nội dung chi tiết và lựa chọn đối tượng gửi (Toàn bộ lớp hoặc từng nhóm phụ huynh cụ thể).
+#### 3.2. Quản lý Tệp đính kèm Đa phương tiện (Media & File Attachment Hub)
+* Tích hợp hệ thống lưu trữ ngoại vi (Infrastructure File Storage), cho phép đính kèm linh hoạt các định dạng tệp tin vào mỗi thông báo (`FileDinhKem`):
+  * **File PDF / Word:** Kế hoạch dã ngoại chi tiết, giấy mời họp phụ huynh, hoặc văn bản thông báo đóng dấu đỏ của Ban Giám Hiệu.
+  * **Hình ảnh / Video:** Ảnh chụp sinh hoạt lớp, biểu đồ thi đua, hoặc hướng dẫn thực hành cho học sinh.
+* Giao diện Front-end (Next.js / Ant Design) tự động hiển thị trình xem trước tệp tin (Document Preview) ngay bên dưới nội dung thông báo, giúp phụ huynh xem tài liệu trực tiếp mà không cần thao tác tải về máy phức tạp.
+
+#### 3.3. Theo dõi Trạng thái Tiếp nhận & Xác nhận Độc lập (Per-Parent Read Receipts & Acknowledgment)
+* Hệ thống không gửi thông báo theo dạng "bắn tin mù", mà tạo ra các mỏ neo theo dõi trạng thái độc lập cho từng hồ sơ phụ huynh trong lớp (`TrangThai`):
+  * **Chỉ số Đã đọc (Read Receipts):** Ghi nhận chính xác thời gian phụ huynh mở xem thông báo. GVCN có thể xem bảng thống kê trực quan (Antd Table) để biết phụ huynh nào đã nắm được thông tin, phụ huynh nào chưa xem để kịp thời nhắc nhở qua số Zalo ưu tiên (`UuTienZalo`).
+  * **Cơ chế Đồng bộ với AI:** Khi phụ huynh tương tác hoặc phản hồi vào thông báo, thuộc tính `LoaiThongBao` ("BaoDiem" hay "KeHoach") sẽ làm tham số đầu vào để **Module 4** bẻ lái ngữ cảnh AI Trợ lý ảo phản hồi đúng trọng tâm nghiệp vụ.
+
+#### 3.4. 🛡️ Ràng Buộc Bảo Mật & Phân Quyền Truyền Thông (Communication RBAC + ABAC)
+* **Quyền phát ngôn của GVCN:** Chỉ duy nhất GVCN đang phụ trách lớp đó mới có quyền khởi tạo, chỉnh sửa hoặc xóa các thông báo kế hoạch của lớp mình.
+* **Quyền giám sát của Hiệu trưởng:** Hiệu trưởng có quyền xem toàn bộ luồng thông báo của tất cả các lớp trong trường để kiểm tra, giám sát chất lượng truyền thông sư phạm, đồng thời có quyền phát hành các "Thông báo toàn trường" (Global Notifications) ghim lên đầu bảng tin của tất cả phụ huynh.
+
+### MODULE 4: TƯƠNG TÁC PHẢN HỒI & TRỢ LÝ ẢO AI (Smart Interaction & Virtual Assistant)
+*(Tác vụ nâng cao - Điểm nhấn Công nghệ đột phá của Đồ án)*  
+Module tự động hóa việc tiếp nhận phản hồi từ phụ huynh bằng Trí tuệ nhân tạo, hoạt động như một "người gác cổng" thông minh giúp giảm tải đến 80% áp lực trả lời tin nhắn cho GVCN:
+
+[Phụ huynh gửi câu hỏi / Phản hồi]
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│          AI CONTEXT AWARENESS ENGINE (Gemini)           │
+│  (Phân tích ngữ cảnh: Hỏi về ĐIỂM SỐ hay KẾ HOẠCH LỚP?) │
+└───────────────┬─────────────────────────┬───────────────┘
+│                         │
+[Luồng 1: Hỏi Báo Điểm]    [Luồng 2: Phản hồi Kế hoạch]
+│                         │
+▼                         ▼
+┌───────────────────────────┐ ┌───────────────────────────┐
+│ VIRTUAL ASSISTANT (AI)    │ │ VIRTUAL ASSISTANT (AI)    │
+│ • Giải thích Thông tư 27  │ │ • Tin nhắn "Đồng ý/OK"    │
+│   (H, T, C là gì?)        │ │   ➔ Tự động gán: ĐÃ XỬ LÝ │
+│ • Giải thích môn nhận xét │ │ • Thắc mắc / Trái chiều   │
+│   (Đạo đức, Thể dục...)   │ │   ➔ Rung chuông cảnh báo  │
+└───────────────────────────┘ └───────────┬───────────────┘
+│
+▼
+┌───────────────────────────┐
+│  CHUYỂN TIẾP CHO GVCN     │
+│  (Can thiệp giải quyết)   │
+└───────────────────────────┘
+
+
+#### 4.1. Phân tích Bối cảnh Thông minh (Context Awareness)
+Hệ thống AI tự động đọc tin nhắn của phụ huynh và phân loại luồng tương tác dựa theo ID và Ngữ cảnh của thông báo gốc: Phụ huynh đang thắc mắc về **"Báo điểm / Kết quả học tập"** hay đang phản hồi cho **"Kế hoạch / Sự kiện lớp"**.
+
+#### 4.2. Trợ lý ảo Xử lý Luồng Báo điểm (Academic AI Assistant)
+* **Tự động giải thích Quy chế:** Khi phụ huynh thắc mắc về tiêu chí đánh giá (ví dụ: *"Tại sao con tôi được chữ H mà không phải chữ T?"*), Trợ lý ảo tự động trích xuất dữ liệu Thông tư 27, phân tích điểm thành phần và phản hồi lời giải thích sư phạm chuẩn xác cho phụ huynh.
+* **Xử lý Môn học Nhận xét:** Nhận diện các từ khóa thắc mắc về môn phụ (Đạo đức, Thể dục, Âm nhạc...) và tự động phản hồi giải thích quy chế quan sát, đánh giá năng lực không dùng điểm số của nhà trường.
+#### 4.2. Trợ lý ảo Xử lý Luồng Báo điểm (Academic AI Assistant)
+* **Tự động giải thích Quy chế & Cung cấp Bằng chứng Pháp lý (Grounding with TT27 Proof):** * Khi phụ huynh đặt câu hỏi thắc mắc về tiêu chí đánh giá bằng chữ (Ví dụ: *"Tại sao con tôi được chữ H mà không phải chữ T?"*, *"Tiêu chí để được khen thưởng cuối năm là gì?"*), Trợ lý ảo AI sẽ tự động trích xuất dữ liệu từ Thông tư 27 để phân tích điểm thành phần và phản hồi câu trả lời sư phạm, thấu tình đạt lý.
+* **Đặc biệt:** Ngay bên dưới câu trả lời của Trợ lý ảo, hệ thống (`TuongTacController`) sẽ **tự động đính kèm đường dẫn liên kết (Hyperlink / Document URL) mở trực tiếp toàn văn văn bản hướng dẫn Thông tư 27/2020/TT-BGDĐT chính thức**. Điều này giúp phụ huynh có thể nhấn vào xem ngay văn bản gốc để đối chứng, tạo độ minh bạch, thuyết phục và tin cậy tuyệt đối giữa Gia đình và Nhà trường.
+* **Xử lý Môn học Nhận xét:** Nhận diện các từ khóa thắc mắc về môn phụ (Đạo đức, Thể dục, Âm nhạc...) và tự động phản hồi giải thích quy chế quan sát, đánh giá năng lực không dùng điểm số của nhà trường kèm link tài liệu quy chế tương ứng.
+#### 4.3. Trợ lý ảo Xử lý Luồng Kế hoạch Lớp (Event & Plan AI Assistant)
+* **Tự động lọc Tin nhắn Xác nhận (Auto-Acknowledge):** Nhận diện các tin nhắn mang tính chất xác nhận đơn giản của phụ huynh (Ví dụ: *"Tôi đồng ý"*, *"Nhất trí"*, *"Gia đình đã nhận thông tin"*, *"Ok"*...) và tự động đánh dấu trạng thái **"Đã xử lý / Đã đồng ý"** trên bảng theo dõi của GVCN, không làm phiền thông báo đến điện thoại giáo viên.
+* **Tự động Phân luồng & Cảnh báo (Escalation Routing):** Đối với các phản hồi chứa từ khóa thắc mắc phức tạp, câu hỏi chi tiết về chi phí/thời gian, hoặc ý kiến trái chiều, Trợ lý ảo sẽ tự động gửi lời nhắn an ủi tiếp nhận thông tin, đồng thời **rung chuông cảnh báo (Notification)** và chuyển tiếp toàn bộ ngữ cảnh đoạn chat về giao diện Web Quản trị để **Giáo viên chủ nhiệm trực tiếp can thiệp và giải quyết**.
+
+---
+
+### IV. CẤU TRÚC CƠ SỞ DỮ LIỆU CHÍNH (CORE DATABASE SCHEMAS)
+Hệ thống kết nối 9 bảng dữ liệu quan hệ trong SQL Server (thể hiện qua Database Diagram) với cấu trúc chi tiết và các ràng buộc nghiệp vụ chặt chẽ:
+
+1. `TaiKhoan` (TenDangNhap [PK], MatKhau, HoTen, VaiTro)
+   * *Lưu trữ tài khoản hệ thống của Hiệu trưởng, Giáo viên và Phụ huynh.*
+2. `LopHoc` (MaLop [PK], TenLop, NienKhoa, GVChuNhiem [FK ➔ TaiKhoan])
+   * *Quản lý lớp học và gán quyền Giáo viên chủ nhiệm.*
+3. `HocSinh` (MaHS [PK], HoTen, NgaySinh, MaLop [FK ➔ LopHoc], TaiKhoanPhuHuynh [FK ➔ TaiKhoan], TrangThai, SDTPhuHuynh, UuTienZalo)
+   * *Hồ sơ học sinh, định danh liên kết phụ huynh và ưu tiên kênh thông báo Zalo.*
+4. `MonHoc` (MaMon [PK], TenMon, SoTinChi, LoaiMon)
+   * *Danh mục môn học, phân loại môn tính điểm số và môn đánh giá bằng nhận xét.*
+5. `PhanCongGiangDay` (MaPhanCong [PK], MaGiaoVien [FK ➔ TaiKhoan], MaLop [FK ➔ LopHoc], MaMon [FK ➔ MonHoc], Thu, Buoi, Tiet)
+   * *🛡️ Ràng buộc duy nhất tổ hợp kép (Anti-Collision Constraints):*
+     * `UNIQUE(MaLop, Thu, Buoi, Tiet)`: Chống 1 lớp có 2 giáo viên cùng dạy 1 tiết.
+     * `UNIQUE(MaGiaoVien, Thu, Buoi, Tiet)`: Chống 1 giáo viên bị trùng lịch dạy 2 lớp cùng lúc.
+6. `BangDiem` (ID [PK], MaHS [FK ➔ HocSinh], MaMon [FK ➔ MonHoc], DiemThi, NhanXet, NgayCapNhat, XepLoai)
+   * *Lưu trữ điểm thi và xếp loại H,T,C phù hợp với điểm thi đó (môn tính điểm) và xếp loại H, T, C (môn nhận xét theo Thông tư 27).*
+7. `KeHoachLop` (MaKeHoach [PK], MaLop [FK ➔ LopHoc], TieuDe, NoiDung, LoaiThongBao, NgayDang, NguoiDang [FK ➔ TaiKhoan], FileDinhKem)
+   * *Lưu trữ thông báo, sự kiện lớp học và đường dẫn tệp đính kèm.*
+8. `TuongTac` (MaTuongTac [PK], MaKeHoach [FK ➔ KeHoachLop], TenDangNhap [FK ➔ TaiKhoan], NoiDung, ThoiGian, TrangThai)
+   * *Hộp thư trao đổi, lịch sử thắc mắc của phụ huynh và phân luồng xử lý AI Trợ lý ảo.*
+9. `DiemDanh` (ID [PK], MaHS [FK ➔ HocSinh], NgayVang, TrangThai, NguoiDiemDanh [FK ➔ TaiKhoan])
+   * *Theo dõi chuyên cần hàng ngày và ghi nhận giáo viên thực hiện điểm danh.*
+   * *🛡️ Ràng buộc duy nhất tổ hợp (Anti-Duplicate Constraint):*
+     * `UNIQUE(MaHS, NgayVang)`: Khóa cứng dữ liệu, ngăn chặn tuyệt đối lỗi 1 học sinh bị điểm danh 2 lần trong cùng 1 ngày học.
