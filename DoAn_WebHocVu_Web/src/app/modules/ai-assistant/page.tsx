@@ -70,7 +70,10 @@ export default function AIAssistantPage() {
       const decoded = parseJwt(token);
       if (decoded) {
         username = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || decoded.sub || username;
-        userRole = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || decoded.role || userRole;
+        userRole = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || 
+                   decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || 
+                   decoded.role || 
+                   userRole;
       }
     }
     

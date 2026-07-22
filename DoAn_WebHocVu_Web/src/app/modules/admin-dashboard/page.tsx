@@ -96,8 +96,21 @@ export default function AdminDashboardPage() {
   const handleResetPassword = async () => {
     try {
       const res = await apiClient.put(`/QuanLyTruong/reset-mat-khau/${currentSelectedUsername}`);
-      message.success(res.data?.message || 'Đã khôi phục mật khẩu mặc định (123456) thành công!');
       setIsResetPassModalOpen(false);
+      
+      Modal.success({
+        title: 'Reset Khôi Phục Mật Khẩu Giáo Viên',
+        content: (
+          <div>
+            <p className="mb-2">Đã reset mật khẩu cho tài khoản giáo viên <b>{currentSelectedUsername}</b> thành công!</p>
+            <p>Tên đăng nhập: <b>{currentSelectedUsername}</b></p>
+            <p>Mật khẩu mới: <b>123456</b></p>
+            <p className="text-amber-600 font-semibold mt-2">
+              BGH vui lòng nhắc giáo viên đổi mật khẩu ngay sau khi đăng nhập.
+            </p>
+          </div>
+        )
+      });
     } catch (err: any) {
       message.error(err.response?.data?.message || 'Không thể khôi phục mật khẩu.');
     }

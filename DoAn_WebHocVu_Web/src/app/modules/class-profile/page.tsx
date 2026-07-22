@@ -108,7 +108,10 @@ export default function ClassProfilePage() {
       if (decoded) {
         // Lấy tên đăng nhập & vai trò từ JWT Claim của C#
         const username = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || decoded.sub || "";
-        const userRole = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || decoded.role || "GiaoVien";
+        const userRole = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || 
+                         decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || 
+                         decoded.role || 
+                         "GiaoVien";
         setRole(userRole);
         setCurrentUser(username);
         setLookupTeacherId(username);
@@ -125,7 +128,10 @@ export default function ClassProfilePage() {
       const token = localStorage.getItem('token');
       if (!token) return;
       const decoded = parseJwt(token);
-      const userRole = decoded?.role || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || 'GiaoVien';
+      const userRole = decoded?.role || 
+                       decoded?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || 
+                       decoded?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || 
+                       'GiaoVien';
       const username = decoded?.sub || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || '';
 
       // Tải danh sách lớp trước tiên
@@ -230,7 +236,7 @@ export default function ClassProfilePage() {
   const handleAssignHomeroom = async (values: any) => {
     setLoading(true);
     try {
-      const res = await apiClient.post(`/QuanLyTruong/phan-cong-chu-nhiem?maLop=${values.maLop}&maGVCN=${values.maGVCN}`);
+      const res = await apiClient.post(`/QuanLyTruong/phan-cong-chu-nhiem?maLop=${values.maLop}&maGVCN=${values.maGVCN || ''}`);
       message.success(res.data.message || 'Phân công chủ nhiệm thành công!');
       setIsAssignHomeroomModalOpen(false);
       homeroomForm.resetFields();
@@ -870,8 +876,8 @@ export default function ClassProfilePage() {
             <Input placeholder="ví dụ: L1A, L2B" />
           </Form.Item>
 
-          <Form.Item name="maGVCN" label="Nhập Mã GVCN (Tên Đăng Nhập)" rules={[{ required: true, message: 'Nhập mã giáo viên!' }]}>
-            <Input placeholder="ví dụ: GVCN1A, GVCN2B" />
+          <Form.Item name="maGVCN" label="Nhập Mã GVCN (Tên Đăng Nhập)" rules={[{ required: false }]}>
+            <Input placeholder="ví dụ: GVCN1A, GVCN2B (để trống để gỡ GVCN lớp này)" />
           </Form.Item>
 
           <Form.Item className="mb-0 flex justify-end">
