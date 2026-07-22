@@ -181,6 +181,11 @@ namespace DoAn_WebHocVu_API.Controllers
                         phanHoiCuaHeThong = "Hệ thống trợ lý ảo: Đã ghi nhận phản hồi xác nhận của phụ huynh (dự phòng lỗi kết nối).";
                         phanHoi.TrangThai = "Đã phản hồi";
                     }
+                    else if ((norm.Contains("cùng 8") || norm.Contains("cũng 8") || norm.Contains("cùng 7") || norm.Contains("cũng 7")) && (norm.Contains("t") || norm.Contains("h")))
+                    {
+                        phanHoiCuaHeThong = "Trợ lý ảo (dự phòng): Dạ thưa phụ huynh, theo Thông tư 27, điểm số bài kiểm tra định kỳ (như 7đ, 8đ) chỉ là một phần để đánh giá. Để đạt mức T (Hoàn thành Tốt), bộ giáo dục yêu cầu học sinh còn phải thể hiện sự vượt trội liên tục về phẩm chất, năng lực trên lớp hàng ngày so với mặt bằng chung, không chỉ dựa vào mỗi điểm kiểm tra. Phụ huynh hãy tiếp tục động viên bé nhé. Chi tiết Thông tư 27 tại [Tài Liệu Mở Rộng: /files/ThongTu27.pdf].";
+                        phanHoi.TrangThai = "AI đã trả lời";
+                    }
                     else if (containsTT27Keywords)
                     {
                         bool isT = System.Text.RegularExpressions.Regex.IsMatch(norm, @"\b(t|tốt|tot)\b") 

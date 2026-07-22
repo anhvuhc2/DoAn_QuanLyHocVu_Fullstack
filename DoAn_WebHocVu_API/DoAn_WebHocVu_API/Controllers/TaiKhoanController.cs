@@ -103,6 +103,7 @@ namespace DoAn_WebHocVu_API.Controllers
             // BƯỚC 2: Chế biến thêm cột "NhiemVu" ngay trên RAM của máy chủ
             var danhSachHoanThien = danhSachTho.Select(tk => new
             {
+                TenDangNhap = tk.TenDangNhap,
                 HoTen = tk.HoTen,
                 VaiTro = tk.VaiTro,
                 // THUẬT TOÁN ĐỌC TÊN:
