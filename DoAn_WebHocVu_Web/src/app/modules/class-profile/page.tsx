@@ -74,7 +74,7 @@ export default function ClassProfilePage() {
   const [teacherAccForm] = Form.useForm();
   const [studentForm] = Form.useForm();
   const [parentAccForm] = Form.useForm();
-  
+
   // Student modal edit mode
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
 
@@ -108,16 +108,16 @@ export default function ClassProfilePage() {
       if (decoded) {
         // Lấy tên đăng nhập & vai trò từ JWT Claim của C#
         const username = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || decoded.sub || "";
-        const userRole = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || 
-                         decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || 
-                         decoded.role || 
-                         "GiaoVien";
+        const userRole = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ||
+          decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+          decoded.role ||
+          "GiaoVien";
         setRole(userRole);
         setCurrentUser(username);
         setLookupTeacherId(username);
       }
     }
-    
+
     // Tải dữ liệu ban đầu
     fetchInitialData();
   }, []);
@@ -128,10 +128,10 @@ export default function ClassProfilePage() {
       const token = localStorage.getItem('token');
       if (!token) return;
       const decoded = parseJwt(token);
-      const userRole = decoded?.role || 
-                       decoded?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || 
-                       decoded?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || 
-                       'GiaoVien';
+      const userRole = decoded?.role ||
+        decoded?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ||
+        decoded?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+        'GiaoVien';
       const username = decoded?.sub || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || '';
 
       // Tải danh sách lớp trước tiên
@@ -186,7 +186,7 @@ export default function ClassProfilePage() {
 
   const fetchScheduleForTeacher = async (teacherId: string) => {
     if (!teacherId) return;
-    
+
     // BƯỚC 1: Xóa trắng sạch sẽ bộ đệm của Table cũ
     setSchedules([]);
     setLoading(true);
@@ -194,12 +194,12 @@ export default function ClassProfilePage() {
     try {
       const res = await apiClient.get(`/TaiKhoan/lich-day/${teacherId}`);
       if (res.data && Array.isArray(res.data)) {
-        
+
         // VÒNG BẢO VỆ FRONTEND: Loại bỏ rò rỉ dữ liệu lịch cũ bị cache hoặc trộn từ React State
-        const strictFilter = res.data.filter(item => 
+        const strictFilter = res.data.filter(item =>
           item.maGiaoVien && item.maGiaoVien.trim().toUpperCase() === teacherId.trim().toUpperCase()
         );
-        
+
         setSchedules(strictFilter);
 
       } else {
@@ -536,7 +536,6 @@ export default function ClassProfilePage() {
           <Space>
             <Button
               size="small"
-              disabled={record.trangThai === 'Đã chuyển trường'}
               onClick={() => {
                 setEditingStudent(record);
                 studentForm.setFieldsValue({
@@ -656,7 +655,7 @@ export default function ClassProfilePage() {
                       </div>
                     </Space>
                   </Col>
-                  
+
                   <Col>
                     <Space>
                       {/* Chỉ GVCN lớp đó và Hiệu trưởng mới được nhập điểm danh và thêm học sinh */}
@@ -711,21 +710,21 @@ export default function ClassProfilePage() {
                       <Input id="chkMaLop" placeholder="Mã Lớp" style={{ width: 90 }} />
                       <Input id="chkMaMon" placeholder="Mã Môn" style={{ width: 90 }} />
                       <Button type="default" icon={<SearchOutlined />} onClick={async () => {
-                         const mgv = (document.getElementById('chkMaGiaoVien') as HTMLInputElement)?.value;
-                         const mlop = (document.getElementById('chkMaLop') as HTMLInputElement)?.value;
-                         const mmon = (document.getElementById('chkMaMon') as HTMLInputElement)?.value;
-                         if(!mgv || !mlop || !mmon) return message.warning('Vui lòng nhập đủ 3 trường hợp mã định danh!');
-                         try {
-                           const res = await apiClient.get(`/TaiKhoan/kiem-tra-phan-cong?maGiaoVien=${mgv}&maLop=${mlop}&maMon=${mmon}`);
-                           Modal.success({ title: 'Tra Cứu Hợp Lệ CSDL', content: res.data.message });
-                         } catch(err: any) {
-                           Modal.error({ title: 'Tra Cứu Thất Bại', content: err.response?.data?.message || 'Giáo viên không có quyền đảm nhận phân công này tại thời điểm hiện tại!' });
-                         }
+                        const mgv = (document.getElementById('chkMaGiaoVien') as HTMLInputElement)?.value;
+                        const mlop = (document.getElementById('chkMaLop') as HTMLInputElement)?.value;
+                        const mmon = (document.getElementById('chkMaMon') as HTMLInputElement)?.value;
+                        if (!mgv || !mlop || !mmon) return message.warning('Vui lòng nhập đủ 3 trường hợp mã định danh!');
+                        try {
+                          const res = await apiClient.get(`/TaiKhoan/kiem-tra-phan-cong?maGiaoVien=${mgv}&maLop=${mlop}&maMon=${mmon}`);
+                          Modal.success({ title: 'Tra Cứu Hợp Lệ CSDL', content: res.data.message });
+                        } catch (err: any) {
+                          Modal.error({ title: 'Tra Cứu Thất Bại', content: err.response?.data?.message || 'Giáo viên không có quyền đảm nhận phân công này tại thời điểm hiện tại!' });
+                        }
                       }}>Tra cứu quyền</Button>
                     </Space>
                   </Col>
                 </Row>
-                
+
                 <Row gutter={[16, 16]} className="mb-4" align="middle" justify="space-between">
                   <Col>
                     <Space>
