@@ -94,6 +94,9 @@ namespace DoAn_WebHocVu_API.Controllers
             hocSinhGoc.NgaySinh = hsCapNhat.NgaySinh;
             hocSinhGoc.MaLop = hsCapNhat.MaLop; // Có thể chuyển lớp nếu giáo viên chủ nhiệm thao tác
             hocSinhGoc.TaiKhoanPhuHuynh = hsCapNhat.TaiKhoanPhuHuynh;
+            hocSinhGoc.SdtPhuHuynh = hsCapNhat.SdtPhuHuynh;
+            hocSinhGoc.UuTienZalo = hsCapNhat.UuTienZalo;
+            hocSinhGoc.TrangThai = hsCapNhat.TrangThai;
 
             await _context.SaveChangesAsync();
             return Ok(new { message = $"Thành công! Đã cập nhật thông tin học sinh {maHS}." });
