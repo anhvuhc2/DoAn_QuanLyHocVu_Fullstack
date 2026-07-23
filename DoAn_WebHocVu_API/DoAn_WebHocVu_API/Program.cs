@@ -1,12 +1,18 @@
-
 using Microsoft.EntityFrameworkCore;
 using DoAn_WebHocVu_API.Models;
+using DoAn_WebHocVu_API.Application.Interfaces;
+using DoAn_WebHocVu_API.Application.Services;
+using DoAn_WebHocVu_API.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Đăng ký "Người vận chuyển" DbContext vào hệ thống
 builder.Services.AddDbContext<DoAnWebHocVuAdvancedContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Đăng ký Clean Architecture Dependencies
+builder.Services.AddScoped<IBangDiemRepository, BangDiemRepository>();
+builder.Services.AddScoped<IBangDiemService, BangDiemService>();
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>
