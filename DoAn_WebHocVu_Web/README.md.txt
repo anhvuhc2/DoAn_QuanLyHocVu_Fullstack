@@ -60,7 +60,7 @@ Cần cài đặt:
 2. Tạo database
 
 ```
-PROJECT_QUANLYHOCSINH26BT
+PROJECT_QUANLYHOCSINHHOCVU
 ```
 
 3. Chạy file
@@ -221,6 +221,7 @@ Bao gồm:
 # Tác giả
 
 Nguyễn Thị Anh Vũ
+Nguyễn phương nhung
 
 Đồ án tốt nghiệp
 
